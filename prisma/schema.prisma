@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String      @id @default(uuid()) @db.Uuid
+  email              String      @unique
+  passwordHash       String?
+  role               Role        @default(USER)
+  firstName          String?
+  lastName           String?
+  licenseNumber      String?     @unique
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  licenseExpiryDate  DateTime?
+  phoneNumber        String?
+  assignedTransports Transport[] @relation("DriverTransports")
+
+  @@map("users")
+}
+
+model Vehicle {
+  id           String      @id @default(uuid()) @db.Uuid
+  parkNumber   String      @unique
+  licensePlate String      @unique
+  brand        String
+  model        String
+  year         Int?
+  capacity     Int
+  isActive     Boolean     @default(true)
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  transports   Transport[]
+
+  @@map("vehicles")
+}
+
+model Location {
+  id                  String          @id @default(uuid()) @db.Uuid
+  name                String
+  address             String
+  city                String
+  postalCode          String
+  country             String          @default("France")
+  latitude            Decimal?        @db.Decimal(10, 8)
+  longitude           Decimal?        @db.Decimal(11, 8)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  transportSteps      TransportStep[]
+  arrivalTransports   Transport[]     @relation("ArrivalLocation")
+  departureTransports Transport[]     @relation("DepartureLocation")
+
+  @@map("locations")
+}
+
+model Customer {
+  id          String      @id @default(uuid()) @db.Uuid
+  name        String
+  contactName String?
+  email       String?     @unique
+  phone       String?
+  address     String?
+  city        String?
+  postalCode  String?
+  notes       String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  transports  Transport[]
+
+  @@map("customers")
+}
+
+model Transport {
+  id                  String          @id @default(uuid()) @db.Uuid
+  transportNumber     String          @unique
+  driverId            String          @db.Uuid
+  vehicleId           String          @db.Uuid
+  customerId          String          @db.Uuid
+  departureLocationId String          @db.Uuid
+  arrivalLocationId   String          @db.Uuid
+  departureDateTime   DateTime
+  arrivalDateTime     DateTime
+  passengerCount      Int             @default(0)
+  distance            Decimal?        @db.Decimal(8, 2)
+  status              TransportStatus @default(PLANNED)
+  notes               String?
+  price               Decimal?        @db.Decimal(10, 2)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  steps               TransportStep[]
+  arrivalLocation     Location        @relation("ArrivalLocation", fields: [arrivalLocationId], references: [id])
+  customer            Customer        @relation(fields: [customerId], references: [id])
+  departureLocation   Location        @relation("DepartureLocation", fields: [departureLocationId], references: [id])
+  driver              User            @relation("DriverTransports", fields: [driverId], references: [id])
+  vehicle             Vehicle         @relation(fields: [vehicleId], references: [id])
+
+  @@map("transports")
+}
+
+model TransportStep {
+  id              String    @id @default(uuid()) @db.Uuid
+  transportId     String    @db.Uuid
+  locationId      String    @db.Uuid
+  stepOrder       Int
+  arrivalTime     DateTime
+  departureTime   DateTime?
+  passengerChange Int       @default(0)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  location        Location  @relation(fields: [locationId], references: [id])
+  transport       Transport @relation(fields: [transportId], references: [id], onDelete: Cascade)
+
+  @@unique([transportId, stepOrder])
+  @@map("transport_steps")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum TransportStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+}
