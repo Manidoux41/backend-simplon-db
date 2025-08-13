@@ -6,13 +6,15 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-  "dev": "node src/server.js",
-  "start": "node src/server.js",
-  "prisma:generate": "prisma generate",
-  "prisma:studio": "prisma studio",
-  "prisma:migrate": "prisma migrate dev --name init",
-  "prisma:seed": "node --experimental-specifier-resolution=node prisma/seed.mjs",
-  "test": "jest --runInBand"
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "build": "prisma generate",
+    "vercel-build": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:seed": "node --experimental-specifier-resolution=node prisma/seed.mjs",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",

@@ -22,6 +22,12 @@ coverage/
 .nyc_output
 
 # ===================================
+# Vercel
+# ===================================
+.vercel
+.env*.local
+
+# ===================================
 # Environment Variables
 # ===================================
 .env
@@ -33,6 +39,7 @@ coverage/
 
 # Exception: Keep example files
 !.env.example
+!.env.production
 
 # ===================================
 # Logs

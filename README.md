@@ -54,6 +54,25 @@ npm start        # Production
 npm run dev      # Développement
 ```
 
+## 🚀 Déploiement Vercel
+
+Voir le guide détaillé : [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)
+
+```bash
+# Installation CLI Vercel
+npm i -g vercel
+
+# Déploiement
+vercel login
+vercel
+
+# Configuration des variables d'environnement dans Vercel dashboard
+# Puis redéploiement
+vercel --prod
+```
+
+**URL de production** : `https://your-transport-api.vercel.app`
+
 ## 🔐 Authentification Double
 
 ### 1. Authentification Locale (Prisma)
